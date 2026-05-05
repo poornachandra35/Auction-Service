@@ -1,0 +1,524 @@
+/* ===== DASHBOARD WRAPPER ===== */
+.dashboard {
+  padding: 20px;
+  height: 100vh;
+  overflow-y: auto;
+  color: white;
+}
+
+/* ===== HEADER ===== */
+.dashboard h2 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* ===== SECTION ===== */
+.section-title {
+  margin: 20px 0 10px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* ===== GRID ===== */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* ===== CARD ===== */
+.card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  padding: 15px;
+
+  border: 1px solid rgba(255,255,255,0.25);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* ===== IMAGE ===== */
+.card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+/* ===== TEXT ===== */
+.card p {
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+/* ===== INPUT ===== */
+.card input {
+  width: 100%;
+  padding: 8px;
+  margin: 6px 0;
+
+  border-radius: 6px;
+  border: none;
+}
+
+/* ===== BUTTON GROUP ===== */
+.btn-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* ===== BUTTON ===== */
+.btn {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* ===== BUTTON COLORS ===== */
+.btn-update {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-delete {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-save {
+  background: #22c55e;
+  color: white;
+}
+
+.btn-cancel {
+  background: #6b7280;
+  color: white;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== FILTER BAR ===== */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(255,255,255,0.1);
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+
+  backdrop-filter: blur(10px);
+}
+
+/* INPUT */
+.filter-bar input {
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  min-width: 150px;
+}
+
+/* SLIDER */
+.filter-slider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* BUTTON GROUP */
+.filter-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+/* STATUS BUTTON */
+.filter-buttons button {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: rgba(255,255,255,0.2);
+  color: white;
+}
+
+/* SORT */
+.filter-bar select {
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .filter-bar {
+    flex-direction: column;
+  }
+}
+
+/* ===== FILTER BUTTON ===== */
+.filter-toggle {
+  position: fixed;
+  top: 80px;
+  left: 20px;
+  z-index: 1000;
+
+  background: #4f46e5;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+/* ===== OVERLAY ===== */
+.filter-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background: rgba(0,0,0,0.4);
+  z-index: 999;
+}
+
+/* ===== SIDEBAR ===== */
+.filter-sidebar {
+  width: 260px;
+  height: 100%;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(20px);
+
+  padding: 20px;
+  color: white;
+
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.filter-sidebar input,
+.filter-sidebar select {
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+}
+
+.filter-sidebar button {
+  padding: 6px;
+  border: none;
+  border-radius: 6px;
+  background: #3b82f6;
+  color: white;
+  cursor: pointer;
+}
+/* ===== LIGHT / DARK MODE ===== */
+.dashboard.dark {
+  color: white;
+}
+
+.dashboard.light {
+  background: #f9fafb;
+  color: #111;
+}
+
+/* ===== HEADER ===== */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-actions button {
+  margin-left: 10px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+/* ===== SIDEBAR ===== */
+.overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.sidebar {
+  width: 260px;
+  height: 100%;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(20px);
+  padding: 20px;
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  animation: slide 0.3s ease;
+}
+
+@keyframes slide {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.sidebar input,
+.sidebar select {
+  width: 100%;
+  margin: 10px 0;
+  padding: 8px;
+}
+
+.sidebar button {
+  width: 100%;
+  margin: 5px 0;
+}
+
+/* ===== STATUS ===== */
+.status {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.status.active { color: #22c55e; }
+.status.created { color: #3b82f6; }
+.status.ended { color: #ef4444; }
+
+/* ===== TIMER ===== */
+.timer.red { color: red; }
+.timer.blue { color: #3b82f6; }
+
+/* ===== BID BUTTON ===== */
+.bid-btn {
+  background: #22c55e;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+/* ===== PROFILE ===== */
+.profile-wrapper {
+  position: relative;
+}
+
+/* circle avatar */
+.profile-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+
+  background: linear-gradient(135deg, #3b82f6, #9333ea);
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* dropdown */
+.profile-dropdown {
+  position: absolute;
+  right: 0;
+  top: 50px;
+
+  width: 120px;
+
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(20px);
+
+  border-radius: 10px;
+  padding: 10px;
+
+  animation: fadeIn 0.2s ease;
+}
+
+.profile-dropdown p {
+  cursor: pointer;
+  padding: 6px;
+}
+
+.profile-dropdown p:hover {
+  background: rgba(255,255,255,0.2);
+  border-radius: 6px;
+}
+
+/* animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* IMAGE WRAPPER */
+.image-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+/* ZOOM BUTTON (hidden by default) */
+.zoom-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  background: rgba(0,0,0,0.6);
+  color: white;
+
+  padding: 6px;
+  border-radius: 50%;
+
+  opacity: 0;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* SHOW ON HOVER */
+.image-container:hover .zoom-btn {
+  opacity: 1;
+}
+
+/* ZOOM OVERLAY */
+.zoom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 5000;
+}
+
+/* ZOOM IMAGE */
+.zoom-img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 10px;
+  animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ===== ANALYTICS ===== */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.analytics-card {
+  background: rgba(255,255,255,0.15);
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.chart-box {
+  background: rgba(255,255,255,0.15);
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+}
+
+/* heatmap */
+.heat-row {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+}
+
+.heat-cell {
+  width: 20px;
+  height: 20px;
+  background: red;
+  margin: 2px;
+}
+
+/* table */
+.analytics-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.analytics-table td,
+.analytics-table th {
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
+}
+.card {
+  transition: all 0.3s ease;
+}
+
+/* expanded card */
+.card.active {
+  transform: scale(1.05);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.35);
+}
+.bid-box {
+  margin-top: 10px;
+  animation: expandBid 0.3s ease;
+}
+
+@keyframes expandBid {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
