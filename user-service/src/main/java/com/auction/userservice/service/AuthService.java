@@ -23,7 +23,8 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-
+    private static final String ADMIN_EMAIL = "admin@gmail.com";
+    private static final String ADMIN_PASSWORD = "admin123";
     // OTP storage
     private final Map<String, String> tempOtpStore = new ConcurrentHashMap<>();
     private final Map<String, Long> otpExpiryStore = new ConcurrentHashMap<>();
@@ -63,12 +64,44 @@ public class AuthService {
     }
 
     // ================= LOGIN =================
+//    public String login(LoginRequest request) {
+//
+//        User user = userRepository.findByEmail(request.getEmail())
+//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+//
+//        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+//            throw new BadRequestException("Invalid credentials");
+//        }
+//
+//        return jwtUtil.generateToken(user);
+//    }
     public String login(LoginRequest request) {
 
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        // ================= ADMIN LOGIN =================
+        if (
+            request.getEmail().equals(ADMIN_EMAIL) &&
+            request.getPassword().equals(ADMIN_PASSWORD)
+        ) {
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            User adminUser = User.builder()
+                    .id(0L)
+                    .name("System Admin")
+                    .email(ADMIN_EMAIL)
+                    .role(Role.ADMIN)
+                    .build();
+
+            return jwtUtil.generateToken(adminUser);
+        }
+
+        // ================= NORMAL USER LOGIN =================
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
+        if (!passwordEncoder.matches(
+                request.getPassword(),
+                user.getPassword()
+        )) {
             throw new BadRequestException("Invalid credentials");
         }
 

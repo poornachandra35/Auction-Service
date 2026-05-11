@@ -1,58 +1,135 @@
 package com.auction.exception;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 🔥 Validation Errors
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidationException(MethodArgumentNotValidException ex) {
+    // VALIDATION ERRORS
+    @ExceptionHandler(
+            MethodArgumentNotValidException.class
+    )
+    public ResponseEntity<?> handleValidationException(
+            MethodArgumentNotValidException ex
+    ) {
 
-        Map<String, String> errors = new HashMap<>();
+        log.error(
+                "Validation exception occurred",
+                ex
+        );
 
-        ex.getBindingResult().getFieldErrors()
-                .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+        Map<String, String> errors =
+                new HashMap<>();
 
-        return ResponseEntity.badRequest().body(errors);
+        ex.getBindingResult()
+                .getFieldErrors()
+                .forEach(error ->
+                        errors.put(
+                                error.getField(),
+                                error.getDefaultMessage()
+                        )
+                );
+
+        return ResponseEntity
+                .badRequest()
+                .body(errors);
     }
 
-    // 🔥 Resource Not Found
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<?> handleNotFound(ResourceNotFoundException ex) {
+    // RESOURCE NOT FOUND
+    @ExceptionHandler(
+            ResourceNotFoundException.class
+    )
+    public ResponseEntity<?> handleNotFound(
+            ResourceNotFoundException ex
+    ) {
 
-        return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+        log.error(
+                "Resource not found: {}",
+                ex.getMessage()
+        );
+
+        return buildResponse(
+                ex.getMessage(),
+                HttpStatus.NOT_FOUND
+        );
     }
 
-    // 🔥 Bad Request
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<?> handleBadRequest(BadRequestException ex) {
+    // BAD REQUEST
+    @ExceptionHandler(
+            BadRequestException.class
+    )
+    public ResponseEntity<?> handleBadRequest(
+            BadRequestException ex
+    ) {
 
-        return buildResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        log.error(
+                "Bad request: {}",
+                ex.getMessage()
+        );
+
+        return buildResponse(
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST
+        );
     }
 
-    // 🔥 Generic Exception
+    // GENERIC EXCEPTION
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGeneric(Exception ex) {
+    public ResponseEntity<?> handleGeneric(
+            Exception ex
+    ) {
 
-        return buildResponse("Something went wrong: " + ex.getMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR);
+        log.error(
+                "Internal server error",
+                ex
+        );
+
+        return buildResponse(
+                "Something went wrong: "
+                        + ex.getMessage(),
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
     }
 
-    private ResponseEntity<?> buildResponse(String message, HttpStatus status) {
+    private ResponseEntity<?> buildResponse(
+            String message,
+            HttpStatus status
+    ) {
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", status.value());
-        response.put("message", message);
+        Map<String, Object> response =
+                new HashMap<>();
 
-        return new ResponseEntity<>(response, status);
+        response.put(
+                "timestamp",
+                LocalDateTime.now()
+        );
+
+        response.put(
+                "status",
+                status.value()
+        );
+
+        response.put(
+                "message",
+                message
+        );
+
+        return new ResponseEntity<>(
+                response,
+                status
+        );
     }
 }

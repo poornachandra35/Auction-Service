@@ -5,7 +5,7 @@ import com.auction.dto.BidRequest;
 import com.auction.entity.Auction;
 import com.auction.entity.AuctionStatus;
 import com.auction.entity.Bid;
-import com.auction.service.AuctionService;
+import com.auction.service.AuctionServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class AuctionControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private AuctionService auctionService;
+    private AuctionServiceImpl auctionServiceImpl;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -48,7 +48,7 @@ class AuctionControllerTest {
         Auction auction = new Auction();
         auction.setId(1L);
 
-        Mockito.when(auctionService.createAuction(Mockito.any()))
+        Mockito.when(auctionServiceImpl.createAuction(Mockito.any()))
                 .thenReturn(auction);
 
         mockMvc.perform(post("/api/auctions")
@@ -66,7 +66,7 @@ class AuctionControllerTest {
         Auction auction = new Auction();
         auction.setId(1L);
 
-        Mockito.when(auctionService.updateAuction(Mockito.eq(1L), Mockito.any()))
+        Mockito.when(auctionServiceImpl.updateAuction(Mockito.eq(1L), Mockito.any()))
                 .thenReturn(auction);
 
         mockMvc.perform(put("/api/auctions/1")
@@ -83,7 +83,7 @@ class AuctionControllerTest {
         Auction auction = new Auction();
         auction.setId(1L);
 
-        Mockito.when(auctionService.updateAuctionByItemId(Mockito.eq(10L), Mockito.any()))
+        Mockito.when(auctionServiceImpl.updateAuctionByItemId(Mockito.eq(10L), Mockito.any()))
                 .thenReturn(auction);
 
         mockMvc.perform(put("/api/auctions/by-item/10")
@@ -116,7 +116,7 @@ class AuctionControllerTest {
         request.setUserId(10L);
         request.setAmount(200.0);
 
-        Mockito.when(auctionService.placeBid(Mockito.any()))
+        Mockito.when(auctionServiceImpl.placeBid(Mockito.any()))
                 .thenReturn("Bid placed successfully");
 
         mockMvc.perform(post("/api/auctions/bid")
@@ -129,7 +129,7 @@ class AuctionControllerTest {
     // ✅ GET BY SELLER
     @Test
     void testGetAuctionsBySeller() throws Exception {
-        Mockito.when(auctionService.getAuctionsBySeller(101L))
+        Mockito.when(auctionServiceImpl.getAuctionsBySeller(101L))
                 .thenReturn(List.of(new Auction()));
 
         mockMvc.perform(get("/api/auctions/seller/101"))
@@ -139,7 +139,7 @@ class AuctionControllerTest {
     // ✅ GET BIDS
     @Test
     void testGetBids() throws Exception {
-        Mockito.when(auctionService.getBidsByAuction(1L))
+        Mockito.when(auctionServiceImpl.getBidsByAuction(1L))
                 .thenReturn(List.of(new Bid()));
 
         mockMvc.perform(get("/api/auctions/1/bids"))
@@ -149,7 +149,7 @@ class AuctionControllerTest {
     // ✅ GET HIGHEST BID
     @Test
     void testGetHighestBid() throws Exception {
-        Mockito.when(auctionService.getHighestBid(1L))
+        Mockito.when(auctionServiceImpl.getHighestBid(1L))
                 .thenReturn(500.0);
 
         mockMvc.perform(get("/api/auctions/1/highest-bid"))
@@ -160,7 +160,7 @@ class AuctionControllerTest {
     // ✅ GET ALL
     @Test
     void testGetAuctions() throws Exception {
-        Mockito.when(auctionService.getAuctions(null))
+        Mockito.when(auctionServiceImpl.getAuctions(null))
                 .thenReturn(List.of(new Auction()));
 
         mockMvc.perform(get("/api/auctions"))
@@ -170,7 +170,7 @@ class AuctionControllerTest {
     // ✅ GET BY STATUS
     @Test
     void testGetAuctionsWithStatus() throws Exception {
-        Mockito.when(auctionService.getAuctions(AuctionStatus.CREATED))
+        Mockito.when(auctionServiceImpl.getAuctions(AuctionStatus.CREATED))
                 .thenReturn(List.of(new Auction()));
 
         mockMvc.perform(get("/api/auctions")
@@ -184,7 +184,7 @@ class AuctionControllerTest {
         Auction auction = new Auction();
         auction.setId(1L);
 
-        Mockito.when(auctionService.getAuctionById(1L))
+        Mockito.when(auctionServiceImpl.getAuctionById(1L))
                 .thenReturn(auction);
 
         mockMvc.perform(get("/api/auctions/1"))

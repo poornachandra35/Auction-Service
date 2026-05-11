@@ -1,11 +1,14 @@
-package com.auction.Scheduler;
+package com.auction.scheduler;
 
 import com.auction.entity.Auction;
 import com.auction.entity.AuctionStatus;
+
 import com.auction.repository.AuctionRepository;
-import com.auction.service.AuctionService;
+
+import com.auction.service.impl.AuctionLifecycleService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -13,41 +16,65 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AuctionScheduler {
 
     private final AuctionRepository auctionRepository;
-    private final AuctionService auctionService;
 
-    // Run every 30 seconds
+    private final AuctionLifecycleService
+            auctionLifecycleService;
+
+    // RUN EVERY 30 SECONDS
     @Scheduled(fixedRate = 30000)
     public void updateAuctionStatus() {
 
-        List<Auction> auctions = auctionRepository.findAll();
+        log.info(
+                "Auction scheduler triggered"
+        );
 
-        for (Auction auction : auctions) {
+        LocalDateTime now =
+                LocalDateTime.now();
 
-            LocalDateTime now = LocalDateTime.now();
+        // AUCTIONS TO START
+        List<Auction> auctionsToStart =
+                auctionRepository
+                        .findByStatusAndStartTimeBefore(
+                                AuctionStatus.CREATED,
+                                now
+                        );
 
-            // 🔥 START AUCTION
-            if (auction.getStatus() == AuctionStatus.CREATED &&
-                    now.isAfter(auction.getStartTime())) {
+        // START AUCTIONS
+        for (Auction auction : auctionsToStart) {
 
-                auction.setStatus(AuctionStatus.ACTIVE);
-                auctionRepository.save(auction);
+            auctionLifecycleService
+                    .startAuction(auction.getId());
 
-                System.out.println("Auction started: " + auction.getId());
-            }
+            log.info(
+                    "Auction started with ID: {}",
+                    auction.getId()
+            );
+        }
 
-            // 🔥 END AUCTION
-            if (auction.getStatus() == AuctionStatus.ACTIVE &&
-                    now.isAfter(auction.getEndTime())) {
+        // AUCTIONS TO END
+        List<Auction> auctionsToEnd =
+                auctionRepository
+                        .findByStatusAndEndTimeBefore(
+                                AuctionStatus.ACTIVE,
+                                now
+                        );
 
-                auctionService.endAuction(auction.getId());
+        // END AUCTIONS
+        for (Auction auction : auctionsToEnd) {
 
-                System.out.println("Auction ended: " + auction.getId());
-            }
+            auctionLifecycleService
+                    .endAuction(auction.getId());
+
+            log.info(
+                    "Auction ended with ID: {}",
+                    auction.getId()
+            );
         }
     }
 }

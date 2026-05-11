@@ -1,6 +1,7 @@
 package com.auction.itemservice.service;
 
 import com.auction.itemservice.client.AuctionClient;
+
 import com.auction.itemservice.client.NotificationClient;
 import com.auction.itemservice.client.UserClient;
 import com.auction.itemservice.dto.*;
@@ -16,7 +17,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import com.auction.itemservice.dto.TopCategoryDto;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 @Service
 @RequiredArgsConstructor
 public class ItemService {
@@ -171,8 +176,11 @@ public class ItemService {
         return updatedItem;
     }
 
-    public List<Item> getAllItems() {
-        return itemRepository.findAll();
+    public Page<Item> getAllItems(int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return itemRepository.findAll(pageable);
     }
 
     public Item getItemById(Long id) {
@@ -205,5 +213,17 @@ public class ItemService {
 
     public List<Item> getItemsByCategory(String category) {
         return itemRepository.findByCategory(category);
+    }
+    
+    public List<TopCategoryDto> getTopCategories() {
+
+        List<Object[]> results = itemRepository.getTopCategories();
+
+        return results.stream()
+                .map(obj -> new TopCategoryDto(
+                        (String) obj[0],
+                        (Long) obj[1]
+                ))
+                .toList();
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-
+import org.springframework.data.domain.Page;
 @RestController
 @RequestMapping("/api/items")
 @RequiredArgsConstructor
@@ -49,10 +49,16 @@ public class ItemController {
         return ResponseEntity.ok("Item deleted successfully");
     }
 
-    // ✅ GET ALL
+ // ✅ GET ALL WITH PAGINATION
     @GetMapping
-    public ResponseEntity<List<Item>> getAll() {
-        return ResponseEntity.ok(itemService.getAllItems());
+    public ResponseEntity<Page<Item>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size
+    ) {
+
+        return ResponseEntity.ok(
+                itemService.getAllItems(page, size)
+        );
     }
 
     // ✅ GET BY ID

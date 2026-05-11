@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AuctionServiceTest {
+class AuctionServiceImplTest {
 
     @Mock
     private AuctionRepository auctionRepository;
@@ -37,7 +37,7 @@ class AuctionServiceTest {
     private NotificationClient notificationClient;
 
     @InjectMocks
-    private AuctionService auctionService;
+    private AuctionServiceImpl auctionServiceImpl;
 
     private Auction auction;
 
@@ -64,7 +64,7 @@ class AuctionServiceTest {
 
         when(auctionRepository.save(any(Auction.class))).thenReturn(auction);
 
-        Auction result = auctionService.createAuction(request);
+        Auction result = auctionServiceImpl.createAuction(request);
 
         assertNotNull(result);
         verify(auctionRepository).save(any(Auction.class));
@@ -79,7 +79,7 @@ class AuctionServiceTest {
         when(auctionRepository.findById(1L)).thenReturn(Optional.of(auction));
         when(auctionRepository.save(any())).thenReturn(auction);
 
-        Auction result = auctionService.updateAuction(1L, request);
+        Auction result = auctionServiceImpl.updateAuction(1L, request);
 
         assertNotNull(result);
         verify(auctionRepository).save(auction);
@@ -92,7 +92,7 @@ class AuctionServiceTest {
         when(auctionRepository.findById(1L)).thenReturn(Optional.of(auction));
 
         assertThrows(BadRequestException.class,
-                () -> auctionService.updateAuction(1L, new AuctionRequest()));
+                () -> auctionServiceImpl.updateAuction(1L, new AuctionRequest()));
     }
 
     // ================= UPDATE BY ITEM =================
@@ -103,7 +103,7 @@ class AuctionServiceTest {
         when(auctionRepository.findByItemId(100L)).thenReturn(Optional.of(auction));
         when(auctionRepository.save(any())).thenReturn(auction);
 
-        Auction result = auctionService.updateAuctionByItemId(100L, request);
+        Auction result = auctionServiceImpl.updateAuctionByItemId(100L, request);
 
         assertNotNull(result);
     }
@@ -113,7 +113,7 @@ class AuctionServiceTest {
         when(auctionRepository.findByItemId(100L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class,
-                () -> auctionService.updateAuctionByItemId(100L, new AuctionRequest()));
+                () -> auctionServiceImpl.updateAuctionByItemId(100L, new AuctionRequest()));
     }
 
     // ================= DELETE =================
@@ -121,7 +121,7 @@ class AuctionServiceTest {
     void testDeleteAuctionSuccess() {
         when(auctionRepository.findById(1L)).thenReturn(Optional.of(auction));
 
-        auctionService.deleteAuction(1L);
+        auctionServiceImpl.deleteAuction(1L);
 
         verify(auctionRepository).delete(auction);
     }
@@ -133,7 +133,7 @@ class AuctionServiceTest {
         when(auctionRepository.findById(1L)).thenReturn(Optional.of(auction));
 
         assertThrows(BadRequestException.class,
-                () -> auctionService.deleteAuction(1L));
+                () -> auctionServiceImpl.deleteAuction(1L));
     }
 
     // ================= DELETE BY ITEM =================
@@ -141,7 +141,7 @@ class AuctionServiceTest {
     void testDeleteByItemIdSuccess() {
         when(auctionRepository.findByItemId(100L)).thenReturn(Optional.of(auction));
 
-        auctionService.deleteByItemId(100L);
+        auctionServiceImpl.deleteByItemId(100L);
 
         verify(auctionRepository).delete(auction);
     }
@@ -151,7 +151,7 @@ class AuctionServiceTest {
     void testGetAllAuctions() {
         when(auctionRepository.findAll()).thenReturn(List.of(auction));
 
-        List<Auction> result = auctionService.getAuctions(null);
+        List<Auction> result = auctionServiceImpl.getAuctions(null);
 
         assertEquals(1, result.size());
     }
@@ -161,7 +161,7 @@ class AuctionServiceTest {
         when(auctionRepository.findByStatus(AuctionStatus.CREATED))
                 .thenReturn(List.of(auction));
 
-        List<Auction> result = auctionService.getAuctions(AuctionStatus.CREATED);
+        List<Auction> result = auctionServiceImpl.getAuctions(AuctionStatus.CREATED);
 
         assertEquals(1, result.size());
     }
@@ -170,7 +170,7 @@ class AuctionServiceTest {
     void testGetAuctionByIdSuccess() {
         when(auctionRepository.findById(1L)).thenReturn(Optional.of(auction));
 
-        Auction result = auctionService.getAuctionById(1L);
+        Auction result = auctionServiceImpl.getAuctionById(1L);
 
         assertEquals(1L, result.getId());
     }
@@ -180,7 +180,7 @@ class AuctionServiceTest {
         when(auctionRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class,
-                () -> auctionService.getAuctionById(1L));
+                () -> auctionServiceImpl.getAuctionById(1L));
     }
 
     // ================= START =================
@@ -188,7 +188,7 @@ class AuctionServiceTest {
     void testStartAuctionSuccess() {
         when(auctionRepository.findById(1L)).thenReturn(Optional.of(auction));
 
-        auctionService.startAuction(1L);
+        auctionServiceImpl.startAuction(1L);
 
         assertEquals(AuctionStatus.ACTIVE, auction.getStatus());
         verify(auctionRepository).save(auction);
@@ -201,7 +201,7 @@ class AuctionServiceTest {
         when(auctionRepository.findById(1L)).thenReturn(Optional.of(auction));
 
         assertThrows(BadRequestException.class,
-                () -> auctionService.startAuction(1L));
+                () -> auctionServiceImpl.startAuction(1L));
     }
 
     // ================= BID =================
@@ -216,7 +216,7 @@ class AuctionServiceTest {
 
         when(auctionRepository.findById(1L)).thenReturn(Optional.of(auction));
 
-        String result = auctionService.placeBid(request);
+        String result = auctionServiceImpl.placeBid(request);
 
         assertEquals("Bid placed successfully", result);
         verify(bidRepository).save(any(Bid.class));
@@ -235,7 +235,7 @@ class AuctionServiceTest {
         when(auctionRepository.findById(1L)).thenReturn(Optional.of(auction));
 
         assertThrows(BadRequestException.class,
-                () -> auctionService.placeBid(request));
+                () -> auctionServiceImpl.placeBid(request));
     }
 
     @Test
@@ -250,7 +250,7 @@ class AuctionServiceTest {
         when(auctionRepository.findById(1L)).thenReturn(Optional.of(auction));
 
         assertThrows(BadRequestException.class,
-                () -> auctionService.placeBid(request));
+                () -> auctionServiceImpl.placeBid(request));
     }
 
     // ================= BIDS =================
@@ -259,7 +259,7 @@ class AuctionServiceTest {
         when(bidRepository.findByAuctionId(1L))
                 .thenReturn(List.of(new Bid()));
 
-        List<Bid> bids = auctionService.getBidsByAuction(1L);
+        List<Bid> bids = auctionServiceImpl.getBidsByAuction(1L);
 
         assertEquals(1, bids.size());
     }
@@ -269,7 +269,7 @@ class AuctionServiceTest {
     void testGetHighestBid() {
         when(auctionRepository.findById(1L)).thenReturn(Optional.of(auction));
 
-        Double highest = auctionService.getHighestBid(1L);
+        Double highest = auctionServiceImpl.getHighestBid(1L);
 
         assertEquals(1000, highest);
     }
@@ -280,7 +280,7 @@ class AuctionServiceTest {
         when(auctionRepository.findBySellerId(200L))
                 .thenReturn(List.of(auction));
 
-        List<Auction> result = auctionService.getAuctionsBySeller(200L);
+        List<Auction> result = auctionServiceImpl.getAuctionsBySeller(200L);
 
         assertEquals(1, result.size());
     }
@@ -293,7 +293,7 @@ class AuctionServiceTest {
 
         when(auctionRepository.findById(1L)).thenReturn(Optional.of(auction));
 
-        auctionService.endAuction(1L);
+        auctionServiceImpl.endAuction(1L);
 
         assertEquals(AuctionStatus.ENDED, auction.getStatus());
         verify(notificationClient).sendNotification(any());
@@ -306,7 +306,7 @@ class AuctionServiceTest {
 
         when(auctionRepository.findById(1L)).thenReturn(Optional.of(auction));
 
-        auctionService.endAuction(1L);
+        auctionServiceImpl.endAuction(1L);
 
         verify(notificationClient, never()).sendNotification(any());
     }
@@ -318,6 +318,6 @@ class AuctionServiceTest {
         when(auctionRepository.findById(1L)).thenReturn(Optional.of(auction));
 
         assertThrows(BadRequestException.class,
-                () -> auctionService.endAuction(1L));
+                () -> auctionServiceImpl.endAuction(1L));
     }
 }

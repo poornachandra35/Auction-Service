@@ -1,16 +1,50 @@
 package com.auction.entity;
+import jakarta.persistence.*;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-
 @Entity
+@Table(
+        name = "auction",
+        indexes = {
+
+                @Index(
+                        name = "idx_auction_status",
+                        columnList = "status"
+                ),
+
+                @Index(
+                        name = "idx_auction_seller",
+                        columnList = "sellerId"
+                ),
+
+                @Index(
+                        name = "idx_auction_item",
+                        columnList = "itemId"
+                ),
+
+                @Index(
+                        name = "idx_auction_start_time",
+                        columnList = "startTime"
+                ),
+
+                @Index(
+                        name = "idx_auction_end_time",
+                        columnList = "endTime"
+                ),
+
+                @Index(
+                        name = "idx_auction_status_start",
+                        columnList = "status,startTime"
+                ),
+
+                @Index(
+                        name = "idx_auction_status_end",
+                        columnList = "status,endTime"
+                )
+        }
+)
 @Data
 public class Auction {
 
@@ -19,16 +53,21 @@ public class Auction {
     private Long id;
 
     private Long itemId;
+
     private Long sellerId;
 
-    private double basePrice;
-    private double currentHighestBid;
+    private Double basePrice;
+
+    private Double currentHighestBid;
 
     private Long highestBidderId;
 
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private Long winnerId;
 
     @Enumerated(EnumType.STRING)
     private AuctionStatus status;
+
+    private LocalDateTime startTime;
+
+    private LocalDateTime endTime;
 }
