@@ -1,62 +1,183 @@
 package com.auction.itemservice.exception;
 
+import com.auction.itemservice.dto.ApiErrorResponse;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 🔥 Validation Errors
+    // =====================================================
+    // VALIDATION EXCEPTION
+    // =====================================================
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidation(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ApiErrorResponse>
+    handleValidationException(
 
-        Map<String, String> errors = new HashMap<>();
+            MethodArgumentNotValidException ex,
 
-        ex.getBindingResult().getFieldErrors()
+            HttpServletRequest request
+    ) {
+
+        log.error("Validation failed", ex);
+
+        Map<String, String> validationErrors =
+                new HashMap<>();
+
+        ex.getBindingResult()
+                .getFieldErrors()
                 .forEach(error ->
-                        errors.put(error.getField(), error.getDefaultMessage())
+                        validationErrors.put(
+                                error.getField(),
+                                error.getDefaultMessage()
+                        )
                 );
 
-        return ResponseEntity.badRequest().body(errors);
+        ApiErrorResponse response =
+                ApiErrorResponse.builder()
+                        .timestamp(LocalDateTime.now())
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .error("Validation Error")
+                        .message(
+                                "Invalid request payload"
+                        )
+                        .path(request.getRequestURI())
+                        .validationErrors(validationErrors)
+                        .build();
+
+        return ResponseEntity
+                .badRequest()
+                .body(response);
     }
 
-    // 🔥 Not Found
+    // =====================================================
+    // RESOURCE NOT FOUND
+    // =====================================================
+
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<?> handleNotFound(ResourceNotFoundException ex) {
-        return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<ApiErrorResponse>
+    handleResourceNotFound(
+
+            ResourceNotFoundException ex,
+
+            HttpServletRequest request
+    ) {
+
+        log.error("Resource not found", ex);
+
+        return buildErrorResponse(
+                ex.getMessage(),
+                HttpStatus.NOT_FOUND,
+                request
+        );
     }
 
-    // 🔥 Bad Request
+    // =====================================================
+    // BAD REQUEST
+    // =====================================================
+
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<?> handleBadRequest(BadRequestException ex) {
-        return buildResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ApiErrorResponse>
+    handleBadRequest(
+
+            BadRequestException ex,
+
+            HttpServletRequest request
+    ) {
+
+        log.error("Bad request exception", ex);
+
+        return buildErrorResponse(
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST,
+                request
+        );
     }
 
-    // 🔥 Unauthorized
+    // =====================================================
+    // UNAUTHORIZED
+    // =====================================================
+
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<?> handleUnauthorized(UnauthorizedException ex) {
-        return buildResponse(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<ApiErrorResponse>
+    handleUnauthorized(
+
+            UnauthorizedException ex,
+
+            HttpServletRequest request
+    ) {
+
+        log.error("Unauthorized exception", ex);
+
+        return buildErrorResponse(
+                ex.getMessage(),
+                HttpStatus.UNAUTHORIZED,
+                request
+        );
     }
 
-    // 🔥 Generic
+    // =====================================================
+    // GENERIC EXCEPTION
+    // =====================================================
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGeneric(Exception ex) {
-        return buildResponse("Something went wrong: " + ex.getMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<ApiErrorResponse>
+    handleGenericException(
+
+            Exception ex,
+
+            HttpServletRequest request
+    ) {
+
+        log.error("Unexpected exception occurred", ex);
+
+        return buildErrorResponse(
+                "Internal server error",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                request
+        );
     }
 
-    private ResponseEntity<?> buildResponse(String message, HttpStatus status) {
+    // =====================================================
+    // COMMON RESPONSE BUILDER
+    // =====================================================
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("timestamp", LocalDateTime.now());
-        map.put("status", status.value());
-        map.put("message", message);
+    private ResponseEntity<ApiErrorResponse>
+    buildErrorResponse(
 
-        return new ResponseEntity<>(map, status);
+            String message,
+
+            HttpStatus status,
+
+            HttpServletRequest request
+    ) {
+
+        ApiErrorResponse response =
+                ApiErrorResponse.builder()
+                        .timestamp(LocalDateTime.now())
+                        .status(status.value())
+                        .error(status.getReasonPhrase())
+                        .message(message)
+                        .path(request.getRequestURI())
+                        .build();
+
+        return new ResponseEntity<>(
+                response,
+                status
+        );
     }
 }
