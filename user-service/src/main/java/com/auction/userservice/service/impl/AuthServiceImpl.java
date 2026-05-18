@@ -125,11 +125,16 @@ implements AuthService {
 
         // ✅ CORRECT CALL
         notificationServiceHelper.sendNotification(
-                new NotificationEvent(
-                        user.getId().toString(),
-                        "Your OTP is: " + otp,
-                        email
-                )
+
+                NotificationEvent.builder()
+                        .userId(
+                                user.getId().toString()
+                        )
+                        .email(email)
+                        .message(
+                                "Your OTP is: " + otp
+                        )
+                        .build()
         );
 
         return "OTP generated, but email service is currently unavailable if you didn’t receive it";
@@ -172,11 +177,13 @@ implements AuthService {
 
         // ✅ CORRECT CALL
         notificationServiceHelper.sendNotification(
-                new NotificationEvent(
-                        null,
-                        "Your Registration OTP is: " + otp,
-                        email
-                )
+
+                NotificationEvent.builder()
+                        .email(email)
+                        .message(
+                                "Your Registration OTP is: " + otp
+                        )
+                        .build()
         );
 
         return "OTP generated, but email service is currently unavailable if you didn’t receive it";

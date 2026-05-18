@@ -35,7 +35,7 @@ public class ItemServiceImpl
 
     private final AuctionIntegrationService auctionService;
 
-    private final NotificationService notificationService;
+    private final ItemEventProducer itemEventProducer;
 
     @Override
     public Item createItem(
@@ -79,8 +79,8 @@ public class ItemServiceImpl
 
         auctionService.createAuction(savedItem);
 
-        notificationService
-                .notifyInterestedBuyers(savedItem);
+        itemEventProducer
+        .publishItemCreatedEvent(savedItem);
 
         return savedItem;
     }

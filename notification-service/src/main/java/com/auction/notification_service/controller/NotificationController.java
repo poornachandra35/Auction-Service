@@ -1,8 +1,11 @@
 package com.auction.notification_service.controller;
 
 import com.auction.notification_service.dto.NotificationEvent;
-import com.auction.notification_service.service.NotificationConsumer;
+
+import com.auction.notification_service.service.NotificationProcessorService;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -10,10 +13,15 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class NotificationController {
 
-    private final NotificationConsumer notificationConsumer;
+    private final NotificationProcessorService
+            notificationProcessorService;
 
     @PostMapping
-    public void sendNotification(@RequestBody NotificationEvent event) {
-        notificationConsumer.consume(event);
+    public void sendNotification(
+            @RequestBody NotificationEvent event
+    ) {
+
+        notificationProcessorService
+                .processOtpNotification(event);
     }
 }

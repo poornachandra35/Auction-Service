@@ -62,6 +62,12 @@ public class EmailServiceImpl
                     toEmail
             );
 
+            log.info(
+                    "EMAIL CONTENT -> To: {} | Message: {}",
+                    toEmail,
+                    message
+            );
+
             // =====================================================
             // INITIALIZE MAILJET CLIENT
             // =====================================================

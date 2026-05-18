@@ -3,11 +3,16 @@ package com.auction.notification_service.dto;
 import lombok.*;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class BuyerDto {
-    private Long id;
+
+    private Long userId;
+
     private String name;
+
     private String email;
+
     private String location;
 }

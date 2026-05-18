@@ -1,8 +1,10 @@
 package com.auction.service;
 
 import com.auction.entity.Auction;
+
 import com.auction.entity.AuctionStatus;
 import com.auction.entity.Bid;
+import com.auction.dto.AuctionWinnerEvent;
 
 import com.auction.exception.ResourceNotFoundException;
 
@@ -29,9 +31,9 @@ public class AuctionLifecycleServiceImpl
     private final AuctionRepository auctionRepository;
 
     private final BidRepository bidRepository;
-
-    private final NotificationServiceImpl
-            notificationServiceImpl;
+    private final AuctionEventProducer
+    auctionEventProducer;
+    
 
     private final AuctionStateFactory
             auctionStateFactory;
@@ -124,9 +126,17 @@ public class AuctionLifecycleServiceImpl
                 highestBid.getAmount()
         );
 
-        notificationServiceImpl
-                .sendAuctionWinnerNotification(
-                        highestBid.getUserId()
-                );
+        AuctionWinnerEvent event =
+                AuctionWinnerEvent.builder()
+                        .auctionId(auction.getId())
+                        .winnerId(highestBid.getUserId())
+                        .winningAmount(highestBid.getAmount())
+                        .message(
+                                "Congratulations! You won the auction. Please complete payment."
+                        )
+                        .build();
+
+        auctionEventProducer
+                .publishWinnerEvent(event);
     }
 }
