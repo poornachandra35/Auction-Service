@@ -31,9 +31,9 @@ public class AuctionLifecycleServiceImpl
     private final AuctionRepository auctionRepository;
 
     private final BidRepository bidRepository;
+
     private final AuctionEventProducer
-    auctionEventProducer;
-    
+            auctionEventProducer;
 
     private final AuctionStateFactory
             auctionStateFactory;
@@ -57,13 +57,17 @@ public class AuctionLifecycleServiceImpl
                 .getHandler(AuctionStatus.CREATED)
                 .validateAuction(auction);
 
-        auction.setStatus(AuctionStatus.ACTIVE);
+        auction.setStatus(
+                AuctionStatus.ACTIVE
+        );
 
-        auctionRepository.save(auction);
+        Auction updatedAuction =
+                auctionRepository.save(auction);
 
         log.info(
-                "Auction started successfully with ID: {}",
-                auctionId
+                "Auction started successfully with ID: {} and status: {}",
+                updatedAuction.getId(),
+                updatedAuction.getStatus()
         );
     }
 
@@ -93,7 +97,7 @@ public class AuctionLifecycleServiceImpl
                 )
                 .orElse(null);
 
-        // NO BIDS
+        // NO BIDS FOUND
         if (highestBid == null) {
 
             log.warn(
@@ -101,42 +105,80 @@ public class AuctionLifecycleServiceImpl
                     auctionId
             );
 
-            auction.setStatus(AuctionStatus.ENDED);
+            auction.setStatus(
+                    AuctionStatus.ENDED
+            );
 
-            auctionRepository.save(auction);
+            Auction endedAuction =
+                    auctionRepository.save(auction);
+
+            log.info(
+                    "Auction status updated to ENDED for auctionId: {}",
+                    endedAuction.getId()
+            );
 
             return;
         }
 
+        // UPDATE HIGHEST BIDDER
+        auction.setHighestBidderId(
+                highestBid.getUserId()
+        );
+
+        // UPDATE WINNER
         auction.setWinnerId(
                 highestBid.getUserId()
         );
 
+        // UPDATE FINAL BID
         auction.setCurrentHighestBid(
                 highestBid.getAmount()
         );
 
-        auction.setStatus(AuctionStatus.ENDED);
+        // UPDATE STATUS
+        auction.setStatus(
+                AuctionStatus.ENDED
+        );
 
-        auctionRepository.save(auction);
+        Auction endedAuction =
+                auctionRepository.save(auction);
 
         log.info(
-                "Auction ended successfully. Winner ID: {} | Final Bid: {}",
+                "Auction ended successfully. Auction ID: {} | Winner ID: {} | Final Bid: {}",
+                endedAuction.getId(),
                 highestBid.getUserId(),
                 highestBid.getAmount()
         );
 
+        // CREATE WINNER EVENT
         AuctionWinnerEvent event =
                 AuctionWinnerEvent.builder()
-                        .auctionId(auction.getId())
-                        .winnerId(highestBid.getUserId())
-                        .winningAmount(highestBid.getAmount())
+                        .auctionId(
+                                endedAuction.getId()
+                        )
+                        .winnerId(
+                                highestBid.getUserId()
+                        )
+                        .winningAmount(
+                                highestBid.getAmount()
+                        )
                         .message(
                                 "Congratulations! You won the auction. Please complete payment."
                         )
                         .build();
 
+        log.info(
+                "Publishing auction winner event for auctionId: {} and winnerId: {}",
+                endedAuction.getId(),
+                highestBid.getUserId()
+        );
+
         auctionEventProducer
                 .publishWinnerEvent(event);
+
+        log.info(
+                "Auction winner event published successfully for auctionId: {}",
+                endedAuction.getId()
+        );
     }
 }

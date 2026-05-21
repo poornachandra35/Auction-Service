@@ -6,13 +6,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-
 import org.apache.kafka.common.header.Header;
 
 import org.slf4j.MDC;
 
 import org.springframework.kafka.annotation.KafkaListener;
-
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -26,7 +24,8 @@ public class AuctionWinnerConsumer {
 
     @KafkaListener(
             topics = "auction-winner-topic",
-            groupId = "auction-group"
+            containerFactory =
+                    "auctionKafkaListenerContainerFactory"
     )
     public void consume(
             ConsumerRecord<
@@ -35,49 +34,64 @@ public class AuctionWinnerConsumer {
                     > record
     ) {
 
-        Header correlationHeader =
-                record.headers()
-                        .lastHeader(
-                                "X-Correlation-Id"
+        try {
+
+            Header correlationHeader =
+                    record.headers()
+                            .lastHeader(
+                                    "X-Correlation-Id"
+                            );
+
+            if (correlationHeader != null) {
+
+                String correlationId =
+                        new String(
+                                correlationHeader.value(),
+                                StandardCharsets.UTF_8
                         );
 
-        if (correlationHeader != null) {
+                MDC.put(
+                        "X-Correlation-Id",
+                        correlationId
+                );
+            }
 
-            String correlationId =
-                    new String(
-                            correlationHeader.value(),
-                            StandardCharsets.UTF_8
-                    );
+            AuctionWinnerEvent event =
+                    record.value();
 
-            MDC.put(
-                    "X-Correlation-Id",
-                    correlationId
+            log.info(
+                    "Auction winner event received for winnerId: {}",
+                    event.getWinnerId()
             );
+
+            // TODO:
+            // Replace with User Service call
+
+            String email =
+                    "winner@gmail.com";
+
+            emailService.sendEmail(
+                    email,
+                    event.getMessage()
+            );
+
+            log.info(
+                    "Winner notification sent successfully to: {}",
+                    email
+            );
+
+        } catch (Exception ex) {
+
+            log.error(
+                    "Failed to process auction winner event",
+                    ex
+            );
+
+            throw ex;
+
+        } finally {
+
+            MDC.clear();
         }
-
-        AuctionWinnerEvent event =
-                record.value();
-
-        log.info(
-                "Auction winner event received for winnerId: {}",
-                event.getWinnerId()
-        );
-
-        // TODO:
-        // Fetch winner email from User Service
-
-        String email =
-                "winner@gmail.com";
-
-        emailService.sendEmail(
-                email,
-                event.getMessage()
-        );
-
-        log.info(
-                "Winner notification sent successfully"
-        );
-
-        MDC.clear();
     }
 }

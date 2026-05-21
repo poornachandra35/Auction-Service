@@ -10,7 +10,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.MDC;
 
 import org.springframework.kafka.core.KafkaTemplate;
-
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -38,6 +37,9 @@ public class AuctionEventProducer {
                 > record =
                 new ProducerRecord<>(
                         TOPIC,
+                        String.valueOf(
+                                event.getWinnerId()
+                        ),
                         event
                 );
 
@@ -57,7 +59,7 @@ public class AuctionEventProducer {
         kafkaTemplate.send(record);
 
         log.info(
-                "Auction winner event published for winnerId: {}",
+                "Auction winner event published successfully for winnerId: {}",
                 event.getWinnerId()
         );
     }

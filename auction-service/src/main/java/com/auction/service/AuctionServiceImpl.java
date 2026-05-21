@@ -309,4 +309,28 @@ public class AuctionServiceImpl
         return auctionRepository
                 .findBySellerId(sellerId);
     }
+
+    // GET WON AUCTIONS
+    public List<Auction> getWonAuctions(
+            Long winnerId
+    ) {
+
+        log.info(
+                "Fetching won auctions for winnerId: {}",
+                winnerId
+        );
+
+        List<Auction> auctions =
+                auctionRepository.findByWinnerId(
+                        winnerId
+                );
+
+        log.info(
+                "Total won auctions found for winnerId {} : {}",
+                winnerId,
+                auctions.size()
+        );
+
+        return auctions;
+    }
 }

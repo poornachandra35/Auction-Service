@@ -14,6 +14,7 @@ import java.util.Optional;
 @Repository
 public interface AuctionRepository
         extends JpaRepository<Auction, Long> {
+	List<Auction> findByWinnerId(Long winnerId);
 
     List<Auction> findByStatus(
             AuctionStatus status

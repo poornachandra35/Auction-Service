@@ -281,4 +281,20 @@ public class AuctionController {
                         sellerId
                 );
     }
+    // GET WON AUCTIONS
+    @GetMapping("/winner/{winnerId}")
+    public List<Auction> getWonAuctions(
+            @PathVariable Long winnerId
+    ) {
+
+        log.info(
+                "Fetching won auctions for winnerId: {}",
+                winnerId
+        );
+
+        return auctionService
+                .getWonAuctions(
+                        winnerId
+                );
+    }
 }

@@ -1,6 +1,5 @@
 package com.auction.service.impl;
 
-
 import com.auction.dto.AuctionRequest;
 
 import com.auction.entity.Auction;
@@ -34,5 +33,10 @@ public interface AuctionService {
 
     List<Auction> getAuctionsBySeller(
             Long sellerId
+    );
+
+    // GET WON AUCTIONS
+    List<Auction> getWonAuctions(
+            Long winnerId
     );
 }

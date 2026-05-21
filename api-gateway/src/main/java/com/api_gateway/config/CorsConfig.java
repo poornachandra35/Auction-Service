@@ -19,8 +19,12 @@ public class CorsConfig {
         config.setAllowCredentials(true);
 
         // ✅ Allow your React app
-        config.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
-
+        config.setAllowedOrigins(
+        	    Arrays.asList(
+        	        "http://localhost:5173",
+        	        "http://192.168.1.107:5173"
+        	    )
+        	);
         // ✅ Allow all headers
         config.setAllowedHeaders(Arrays.asList("*"));
 
