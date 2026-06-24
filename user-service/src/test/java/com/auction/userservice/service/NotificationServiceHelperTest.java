@@ -3,85 +3,97 @@ package com.auction.userservice.service;
 import com.auction.userservice.client.NotificationClient;
 import com.auction.userservice.dto.NotificationEvent;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class NotificationServiceHelperTest {
 
     @Mock
     private NotificationClient notificationClient;
 
     @InjectMocks
-    private NotificationServiceHelper helper;
+    private NotificationServiceHelper notificationServiceHelper;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
+    // ================= SUCCESS CASE =================
 
-    // ✅ SUCCESS CASE
     @Test
-    void testSendNotification_success() {
-        // Arrange
-        NotificationEvent event = new NotificationEvent(
-                "1",
-                "Test message",
-                "test@gmail.com"
-        );
+    void testSendNotificationSuccess() {
 
-        // Act
-        helper.sendNotification(event);
+        NotificationEvent event =
+                NotificationEvent.builder()
+                .email("john@gmail.com")
+                .message("Test Notification")
+                .build();
 
-        // Assert
+        doNothing()
+                .when(notificationClient)
+                .sendNotification(event);
+
+        assertDoesNotThrow(() ->
+                notificationServiceHelper
+                .sendNotification(event));
+
         verify(notificationClient, times(1))
                 .sendNotification(event);
     }
 
-    // ✅ FAILURE CASE (simulate exception)
-    @Test
-    void testSendNotification_failure() {
-        // Arrange
-        NotificationEvent event = new NotificationEvent(
-                "1",
-                "Test message",
-                "test@gmail.com"
-        );
+    // ================= FAILURE CASE =================
 
-        doThrow(new RuntimeException("Service down"))
+    @Test
+    void testSendNotificationFailure() {
+
+        NotificationEvent event =
+                NotificationEvent.builder()
+                .email("john@gmail.com")
+                .message("Test Notification")
+                .build();
+
+        doThrow(new RuntimeException("Service Down"))
                 .when(notificationClient)
                 .sendNotification(event);
 
-        // Act + Assert
         try {
-            helper.sendNotification(event);
+
+            notificationServiceHelper
+                    .sendNotification(event);
+
         } catch (Exception ignored) {
-            // Exception expected since fallback won't trigger in unit test
+
         }
 
         verify(notificationClient, times(1))
                 .sendNotification(event);
     }
 
-    // ✅ TEST FALLBACK METHOD DIRECTLY
+    // ================= FALLBACK METHOD =================
+
     @Test
-    void testFallback() {
-        // Arrange
-        NotificationEvent event = new NotificationEvent(
-                "1",
-                "Test message",
-                "test@gmail.com"
+    void testFallbackMethod() {
+
+        NotificationEvent event =
+                NotificationEvent.builder()
+                .email("john@gmail.com")
+                .message("Fallback Test")
+                .build();
+
+        assertDoesNotThrow(() ->
+
+                notificationServiceHelper.fallback(
+
+                        event,
+
+                        new RuntimeException("Service Down")
+                )
         );
-
-        Exception ex = new RuntimeException("Service down");
-
-        // Act
-        helper.fallback(event, ex);
-
-        // Assert
-        // No exception should be thrown
-        // (Fallback just prints logs)
     }
 }
